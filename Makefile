@@ -7,7 +7,7 @@ else
 
 TWEAK_NAME = Cask
 Cask_FILES = Tweak.x
-Cask_FRAMEWORKS = UIKit
+Cask_FRAMEWORKS = UIKit CoreGraphics
 
 OPTFLAG = -Os
 
