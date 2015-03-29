@@ -41,12 +41,14 @@
 				<integer>0</integer>
 				<integer>1</integer>
 				<integer>2</integer>
+				<integer>3</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
 				<string>None</string>
 				<string>Fade</string>
 				<string>Grow</string>
+				<string>Stretch</string>
 			</array>
 		</dict>
 		<dict>
