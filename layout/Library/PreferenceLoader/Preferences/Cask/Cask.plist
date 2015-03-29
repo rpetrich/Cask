@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>title</key>
+	<string>Cask</string>
+	<key>entry</key>
+	<dict>
+		<key>cell</key>
+		<string>PSLinkCell</string>
+		<key>icon</key>
+		<string>/Library/PreferenceLoader/Preferences/Cask/Cask.png</string>
+		<key>label</key>
+		<string>Cask</string>
+	</dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Animate fresh views will cause new tables to animate all of their cells instead of only when new cells are scrolled on screen</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>1</integer>
+			<key>defaults</key>
+			<string>com.rpetrich.cask</string>
+			<key>key</key>
+			<string>AnimationStyle</string>
+			<key>label</key>
+			<string>Style</string>
+			<key>PostNotification</key>
+			<string>com.rpetrich.cask.config-changed</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>None</string>
+				<string>Fade</string>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.rpetrich.cask</string>
+			<key>key</key>
+			<string>AnimateAlways</string>
+			<key>label</key>
+			<string>Animate Fresh Views</string>
+			<key>PostNotification</key>
+			<string>com.rpetrich.cask.config-changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>© 2015 Ryan Petrich</string>
+		</dict>
+	</array>
+</dict>
+</plist>
