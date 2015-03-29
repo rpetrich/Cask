@@ -42,6 +42,7 @@
 				<integer>1</integer>
 				<integer>2</integer>
 				<integer>3</integer>
+				<integer>4</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
@@ -49,6 +50,7 @@
 				<string>Fade</string>
 				<string>Grow</string>
 				<string>Stretch</string>
+				<string>Slide</string>
 			</array>
 		</dict>
 		<dict>

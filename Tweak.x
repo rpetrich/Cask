@@ -6,6 +6,7 @@ typedef enum {
 	AnimationStyleFade = 1,
 	AnimationStyleGrow = 2,
 	AnimationStyleStretch = 3,
+	AnimationStyleSlide = 4,
 } AnimationStyle;
 
 static BOOL GetBooleanSetting(NSString *key, BOOL defaultValue)
@@ -85,6 +86,17 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 					result.transform = CGAffineTransformMakeScale(0.01, 1.0);
 					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
 						result.transform = original;
+					} completion:NULL];
+				});
+				break;
+			case AnimationStyleSlide:
+				dispatch_async(dispatch_get_main_queue(), ^{
+					CGRect original = result.frame;
+					CGRect newFrame = original;
+					newFrame.origin.x += original.size.width;
+					result.frame = newFrame;
+					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
+						result.frame = original;
 					} completion:NULL];
 				});
 				break;
