@@ -40,11 +40,55 @@
 			<array>
 				<integer>0</integer>
 				<integer>1</integer>
+				<integer>2</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
 				<string>None</string>
 				<string>Fade</string>
+				<string>Grow</string>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<real>0.5</real>
+			<key>defaults</key>
+			<string>com.rpetrich.cask</string>
+			<key>key</key>
+			<string>AnimationDuration</string>
+			<key>label</key>
+			<string>Style</string>
+			<key>PostNotification</key>
+			<string>com.rpetrich.cask.config-changed</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>validValues</key>
+			<array>
+				<real>0.1</real>
+				<real>0.25</real>
+				<real>0.33333333</real>
+				<real>0.4</real>
+				<real>0.5</real>
+				<real>0.66666667</real>
+				<real>0.75</real>
+				<real>0.9</real>
+				<real>1</real>
+				<real>1.25</real>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>100 ms</string>
+				<string>250 ms</string>
+				<string>333 ms</string>
+				<string>400 ms</string>
+				<string>500 ms</string>
+				<string>667 ms</string>
+				<string>750 ms</string>
+				<string>900 ms</string>
+				<string>1000 ms</string>
+				<string>1250 ms</string>
 			</array>
 		</dict>
 		<dict>

@@ -20,6 +20,14 @@ static CFIndex GetIntegerSetting(NSString *key, CFIndex defaultValue)
 	return exists ? result : defaultValue;
 }
 
+static double GetDoubleSetting(NSString *key, double defaultValue)
+{
+	id value = (id)CFPreferencesCopyAppValue((CFStringRef)key, CFSTR("com.rpetrich.cask"));
+	double result = [value respondsToSelector:@selector(doubleValue)] ? [value doubleValue] : defaultValue;
+	[value release];
+	return result;
+}
+
 static const BOOL kJustMovedToWindowKey;
 
 static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
@@ -44,16 +52,18 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 
 - (UITableViewCell *)_createPreparedCellForGlobalRow:(NSInteger)globalRow withIndexPath:(NSIndexPath *)indexPath willDisplay:(BOOL)willDisplay
 {
-	if (willDisplay) {
+	AnimationStyle style;
+	if (willDisplay && (style = AnimationStyleForTableView(self))) {
+		NSTimeInterval duration = GetDoubleSetting(@"AnimationDuration", 0.5);
 		UITableViewCell *result = %orig();
-		switch (AnimationStyleForTableView(self)) {
+		switch (style) {
 			case AnimationStyleNone:
 				break;
 			case AnimationStyleFade:
 				dispatch_async(dispatch_get_main_queue(), ^{
 					CGFloat original = result.alpha;
 					result.alpha = 0.0;
-					[UIView animateWithDuration:1.0 delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
+					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
 						result.alpha = original;
 					} completion:NULL];
 				});
