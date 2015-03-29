@@ -59,7 +59,7 @@
 			<key>key</key>
 			<string>AnimationDuration</string>
 			<key>label</key>
-			<string>Style</string>
+			<string>Duration</string>
 			<key>PostNotification</key>
 			<string>com.rpetrich.cask.config-changed</string>
 			<key>detail</key>
