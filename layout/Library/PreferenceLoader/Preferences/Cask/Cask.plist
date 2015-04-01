@@ -43,6 +43,7 @@
 				<integer>2</integer>
 				<integer>3</integer>
 				<integer>4</integer>
+				<integer>5</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
@@ -51,6 +52,7 @@
 				<string>Grow</string>
 				<string>Stretch</string>
 				<string>Slide</string>
+				<string>Slide and Bounce</string>
 			</array>
 		</dict>
 		<dict>
