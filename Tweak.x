@@ -42,6 +42,8 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 	}
 }
 
+%group MOD
+
 %hook UITableView
 
 - (void)didMoveToWindow
@@ -106,6 +108,7 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 		return %orig();
 	}
 }
+%end
 
 %end
 
@@ -114,9 +117,13 @@ static void PreferencesCallback(CFNotificationCenterRef center, void *observer, 
 	CFPreferencesAppSynchronize(CFSTR("com.rpetrich.cask"));
 }
 
-
 %ctor
 {
-	%init();
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PreferencesCallback, CFSTR("com.rpetrich.cask.config-changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+	NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+    NSString *plistpath = @"/var/mobile/Library/Preferences/com.rpetrich.cask.applist.plist";
+    NSMutableDictionary *plistDict = [[NSMutableDictionary alloc] initWithContentsOfFile:plistpath];    
+    if (![[plistDict objectForKey:bundleID] boolValue]) {
+        %init(MOD);
+    }
 }

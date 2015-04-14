@@ -1,120 +1,76 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>title</key>
-	<string>Cask</string>
-	<key>entry</key>
-	<dict>
-		<key>cell</key>
-		<string>PSLinkCell</string>
-		<key>icon</key>
-		<string>/Library/PreferenceLoader/Preferences/Cask/Cask.png</string>
-		<key>label</key>
-		<string>Cask</string>
-	</dict>
-	<key>items</key>
-	<array>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Animate fresh views will cause new tables to animate all of their cells instead of only when new cells are scrolled on screen</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>default</key>
-			<integer>1</integer>
-			<key>defaults</key>
-			<string>com.rpetrich.cask</string>
-			<key>key</key>
-			<string>AnimationStyle</string>
-			<key>label</key>
-			<string>Style</string>
-			<key>PostNotification</key>
-			<string>com.rpetrich.cask.config-changed</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>validValues</key>
-			<array>
-				<integer>0</integer>
-				<integer>1</integer>
-				<integer>2</integer>
-				<integer>3</integer>
-				<integer>4</integer>
-			</array>
-			<key>validTitles</key>
-			<array>
-				<string>None</string>
-				<string>Fade</string>
-				<string>Grow</string>
-				<string>Stretch</string>
-				<string>Slide</string>
-			</array>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>default</key>
-			<real>0.5</real>
-			<key>defaults</key>
-			<string>com.rpetrich.cask</string>
-			<key>key</key>
-			<string>AnimationDuration</string>
-			<key>label</key>
-			<string>Duration</string>
-			<key>PostNotification</key>
-			<string>com.rpetrich.cask.config-changed</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>validValues</key>
-			<array>
-				<real>0.1</real>
-				<real>0.25</real>
-				<real>0.33333333</real>
-				<real>0.4</real>
-				<real>0.5</real>
-				<real>0.66666667</real>
-				<real>0.75</real>
-				<real>0.9</real>
-				<real>1</real>
-				<real>1.25</real>
-			</array>
-			<key>validTitles</key>
-			<array>
-				<string>100 ms</string>
-				<string>250 ms</string>
-				<string>333 ms</string>
-				<string>400 ms</string>
-				<string>500 ms</string>
-				<string>667 ms</string>
-				<string>750 ms</string>
-				<string>900 ms</string>
-				<string>1000 ms</string>
-				<string>1250 ms</string>
-			</array>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.rpetrich.cask</string>
-			<key>key</key>
-			<string>AnimateAlways</string>
-			<key>label</key>
-			<string>Animate Fresh Views</string>
-			<key>PostNotification</key>
-			<string>com.rpetrich.cask.config-changed</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>© 2015 Ryan Petrich</string>
-		</dict>
-	</array>
-</dict>
-</plist>
+entry = {
+	cell = PSLinkCell;
+	icon = "/Library/PreferenceLoader/Preferences/Cask/Cask.png";
+	label = "Cask";
+	items = (
+		{
+			cell = PSGroupCell;
+			footerText = "Animate fresh views will cause new tables to animate all of their cells instead of only when new cells are scrolled on screen";
+		},
+		{
+			cell = PSLinkListCell;
+			default = 1;
+			label = "Style";
+			validValues = (0,1,2,3,4);
+			validTitles = ("None","Fade","Grow","Stretch","Slide");
+			defaults = "com.rpetrich.cask";
+			key = AnimationStyle;
+			PostNotification = "com.rpetrich.cask.config-changed";
+			detail = PSListItemsController;
+		},
+		{
+			cell = PSLinkListCell;
+			detail = PSListItemsController;
+			label = "Duration";
+			validValues = (0.1,0.25,0.33333333,0.4,0.5,0.66666667,0.75,0.9,1,1.25);
+			validTitles = ("100 ms","250 ms","333 ms","400 ms","500 ms","667 ms","750 ms","900 ms","1000 ms","1250 ms");
+			default = 0.5;
+			defaults = "com.rpetrich.cask";
+			PostNotification = "com.rpetrich.cask.config-changed";
+		},
+		{
+			cell = PSSwitchCell;
+			default = false;
+			defaults = "com.rpetrich.cask";
+			key = AnimateAlways;
+			label = "Animate Fresh Views";
+			PostNotification = "com.rpetrich.cask.config-changed";
+		},
+		{
+			cell = PSGroupCell;
+			label = "Disable Cask in";
+		},
+		{
+			bundle = AppList;
+			cell = PSLinkCell;
+			isController = 1;
+			label = "Choose Applications";
+			ALSettingsPath = "/var/mobile/Library/Preferences/com.rpetrich.cask.applist.plist";
+			ALSettingsKeyPrefix = "";
+			ALChangeNotification = "com.rpetrich.cask.config-changed";
+			ALSettingsDefaultValue = 0;
+			ALAllowsSelection = 1;
+			ALSectionDescriptors = (
+				{
+				  title = "User Applications";
+				  predicate = "isSystemApplication = FALSE";
+				  "cell-class-name" = "ALSwitchCell";
+				  "icon-size" = 29;
+				  "suppress-hidden-apps" = 1;
+				  "footer-title" = "© 2010-2012 Ryan Petrich";
+				},
+				{
+				  title = "System Applications";
+				  predicate = "isSystemApplication = TRUE";
+				  "cell-class-name" = "ALSwitchCell";
+				  "icon-size" = 29;
+				  "suppress-hidden-apps" = 1;
+				}
+			);
+		},
+		{
+			cell = PSGroupCell;
+			footerText = "© 2015 Ryan Petrich";
+		}
+	);
+};
