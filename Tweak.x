@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import <notify.h>
 
 typedef enum {
 	AnimationStyleNone = 0,
@@ -9,34 +10,20 @@ typedef enum {
 	AnimationStyleSlide = 4,
 } AnimationStyle;
 
-static BOOL GetBooleanSetting(NSString *key, BOOL defaultValue)
-{
-	Boolean exists;
-	Boolean result = CFPreferencesGetAppBooleanValue((CFStringRef)key, CFSTR("com.rpetrich.cask"), &exists);
-	return exists ? result : defaultValue;
-}
-
-static CFIndex GetIntegerSetting(NSString *key, CFIndex defaultValue)
-{
-	Boolean exists;
-	CFIndex result = CFPreferencesGetAppIntegerValue((CFStringRef)key, CFSTR("com.rpetrich.cask"), &exists);
-	return exists ? result : defaultValue;
-}
-
-static double GetDoubleSetting(NSString *key, double defaultValue)
-{
-	id value = (id)CFPreferencesCopyAppValue((CFStringRef)key, CFSTR("com.rpetrich.cask"));
-	double result = [value respondsToSelector:@selector(doubleValue)] ? [value doubleValue] : defaultValue;
-	[value release];
-	return result;
-}
+static struct {
+	BOOL animateAlways;
+	AnimationStyle animationStyle;
+	NSTimeInterval duration;
+} settings;
+static void PrepareSettings(void);
 
 static const BOOL kJustMovedToWindowKey;
 
 static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 {
-	if ((tableView.window && !objc_getAssociatedObject(tableView, &kJustMovedToWindowKey)) || GetBooleanSetting(@"AnimateAlways", NO)) {
-		return (AnimationStyle)GetIntegerSetting(@"AnimationStyle", AnimationStyleFade);
+	PrepareSettings();
+	if ((tableView.window && !objc_getAssociatedObject(tableView, &kJustMovedToWindowKey)) || settings.animateAlways) {
+		return settings.animationStyle;
 	} else {
 		return AnimationStyleNone;
 	}
@@ -57,7 +44,8 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 {
 	AnimationStyle style;
 	if (willDisplay && (style = AnimationStyleForTableView(self))) {
-		NSTimeInterval duration = GetDoubleSetting(@"AnimationDuration", 0.5);
+		PrepareSettings();
+		NSTimeInterval duration = settings.duration;
 		UITableViewCell *result = %orig();
 		switch (style) {
 			case AnimationStyleNone:
@@ -109,14 +97,68 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 
 %end
 
-static void PreferencesCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+static BOOL GetBooleanSetting(NSString *key, BOOL defaultValue)
 {
-	CFPreferencesAppSynchronize(CFSTR("com.rpetrich.cask"));
+	Boolean exists;
+	Boolean result = CFPreferencesGetAppBooleanValue((CFStringRef)key, CFSTR("com.rpetrich.cask"), &exists);
+	return exists ? result : defaultValue;
 }
 
+static CFIndex GetIntegerSetting(NSString *key, CFIndex defaultValue)
+{
+	Boolean exists;
+	CFIndex result = CFPreferencesGetAppIntegerValue((CFStringRef)key, CFSTR("com.rpetrich.cask"), &exists);
+	return exists ? result : defaultValue;
+}
+
+static double GetDoubleSetting(NSString *key, double defaultValue)
+{
+	id value = (id)CFPreferencesCopyAppValue((CFStringRef)key, CFSTR("com.rpetrich.cask"));
+	double result = [value respondsToSelector:@selector(doubleValue)] ? [value doubleValue] : defaultValue;
+	[value release];
+	return result;
+}
+
+static int notifyToken;
+static BOOL prepared;
+static BOOL isSpringBoard;
+
+static void PrepareSettings(void)
+{
+	if (!prepared) {
+		// Smuggle settings around in the notify state. I'm too lazy to build a real IPC center for such a simple tweak
+		if (notifyToken == 0) {
+			notify_register_check("com.rpetrich.cask.config-changed", &notifyToken);
+		}
+		if (isSpringBoard) {
+			CFPreferencesAppSynchronize(CFSTR("com.rpetrich.cask"));
+			settings.animateAlways = GetBooleanSetting(@"AnimateAlways", NO);
+			settings.animationStyle = (AnimationStyle)GetIntegerSetting(@"AnimationStyle", AnimationStyleFade);
+			settings.duration = GetDoubleSetting(@"AnimationDuration", 0.5);
+			notify_set_state(notifyToken, ((uint64_t)settings.animateAlways << 63) + ((uint64_t)settings.animationStyle << 32) + (uint64_t)(settings.duration * 1000));
+		} else {
+			uint64_t state = 0;
+			notify_get_state(notifyToken, &state);
+			settings.animateAlways = state >> 63;
+			settings.animationStyle = (AnimationStyle)((state >> 32) & 0xFF);
+			settings.duration = (NSTimeInterval)(state & 0xFFFFFFFFl) / 1000.0;
+		}
+	}
+}
+
+static void PreferencesCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+{
+	prepared = NO;
+	if (isSpringBoard) {
+		PrepareSettings();
+	}
+}
 
 %ctor
 {
 	%init();
+	if ((isSpringBoard = (objc_getClass("SpringBoard") != nil))) {
+		PrepareSettings();
+	}
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PreferencesCallback, CFSTR("com.rpetrich.cask.config-changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 }
