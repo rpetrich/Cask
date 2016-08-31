@@ -8,6 +8,7 @@ typedef enum {
 	AnimationStyleGrow = 2,
 	AnimationStyleStretch = 3,
 	AnimationStyleSlide = 4,
+	AnimationStyleSlideAndBounce = 5,
 } AnimationStyle;
 
 static struct {
@@ -86,6 +87,22 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
 						result.frame = original;
 					} completion:NULL];
+				});
+			case AnimationStyleSlideAndBounce:
+				dispatch_async(dispatch_get_main_queue(), ^{
+					CGRect original = result.frame;
+					CGRect newFrame = original;
+					CGRect newFrame2 = original;
+					newFrame2.origin.x -= 25;
+					newFrame.origin.x += original.size.width;
+					result.frame = newFrame;
+					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
+						result.frame = newFrame2;
+					} completion:^(BOOL _) {
+						[UIView animateWithDuration:duration / 2 animations:^{
+							result.frame = original;
+						}];
+					}];
 				});
 				break;
 		}
