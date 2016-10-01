@@ -8,6 +8,7 @@ typedef enum {
 	AnimationStyleGrow = 2,
 	AnimationStyleStretch = 3,
 	AnimationStyleSlide = 4,
+	AnimtationStyleStagger = 5;
 } AnimationStyle;
 
 static struct {
@@ -28,6 +29,8 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 		return AnimationStyleNone;
 	}
 }
+
+NSInteger lastRow;
 
 %hook UITableView
 
@@ -87,6 +90,22 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 						result.frame = original;
 					} completion:NULL];
 				});
+				break;
+			case AnimationStyleStagger:
+				dispatch_async(dispatch_get_main_queue(), ^{
+					CGRect original = result.frame;
+					CGRect newFrame = original;
+					//shield your eyes, lol this works?
+					if(globalRow > lastRow) //going down
+						newFrame.origin.y += 10*original.size.height;
+					else //goin' up... on a monday
+						newFrame.origin.y -= 10*original.size.height;
+					lastRow = globalRow;
+					result.frame = newFrame;
+					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
+						result.frame = original;
+					} completion:NULL];
+				}];	
 				break;
 		}
 		return result;
