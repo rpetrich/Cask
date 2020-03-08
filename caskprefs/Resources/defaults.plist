@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>style</key>
+	<integer>4</integer>
+	<key>duration</key>
+	<real>0.5</real>
+	<key>animateAlways</key>
+	<false/>
+</dict>
+</plist>

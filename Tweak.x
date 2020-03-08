@@ -1,56 +1,34 @@
-#import <UIKit/UIKit.h>
-#import <objc/runtime.h>
-#import <notify.h>
+NSInteger style;
+BOOL animateAlways;
+NSTimeInterval duration;
+BOOL hasMovedToWindow = NO;
 
-typedef enum {
-	AnimationStyleNone = 0,
-	AnimationStyleFade = 1,
-	AnimationStyleGrow = 2,
-	AnimationStyleStretch = 3,
-	AnimationStyleSlide = 4,
-} AnimationStyle;
+%hook UIScrollView
 
-static struct {
-	BOOL animateAlways;
-	AnimationStyle animationStyle;
-	NSTimeInterval duration;
-} settings;
-static void PrepareSettings(void);
-
-static const BOOL kJustMovedToWindowKey;
-
-static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
-{
-	PrepareSettings();
-	if ((tableView.window && !objc_getAssociatedObject(tableView, &kJustMovedToWindowKey)) || settings.animateAlways) {
-		return settings.animationStyle;
-	} else {
-		return AnimationStyleNone;
-	}
+-(BOOL)isDragging {
+	hasMovedToWindow = !%orig;
+	return %orig;
 }
+
+-(void)_scrollViewWillBeginDragging{
+	hasMovedToWindow = NO;
+	return %orig;
+}
+%end 
 
 %hook UITableView
 
-- (void)didMoveToWindow
-{
-	objc_setAssociatedObject(self, &kJustMovedToWindowKey, (id)kCFBooleanTrue, OBJC_ASSOCIATION_ASSIGN);
-	dispatch_async(dispatch_get_main_queue(), ^{
-		objc_setAssociatedObject(self, &kJustMovedToWindowKey, nil, OBJC_ASSOCIATION_ASSIGN);
-	});
-	%orig();
-}
-
 - (UITableViewCell *)_createPreparedCellForGlobalRow:(NSInteger)globalRow withIndexPath:(NSIndexPath *)indexPath willDisplay:(BOOL)willDisplay
 {
-	AnimationStyle style;
-	if (willDisplay && (style = AnimationStyleForTableView(self))) {
-		PrepareSettings();
-		NSTimeInterval duration = settings.duration;
-		UITableViewCell *result = %orig();
+		__block UITableViewCell *result = %orig;
+		
+		if (hasMovedToWindow && !animateAlways)
+			return result;
+
 		switch (style) {
-			case AnimationStyleNone:
+			case 0:
 				break;
-			case AnimationStyleFade:
+			case 1:
 				dispatch_async(dispatch_get_main_queue(), ^{
 					CGFloat original = result.alpha;
 					result.alpha = 0.0;
@@ -59,16 +37,25 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 					} completion:NULL];
 				});
 				break;
-			case AnimationStyleGrow:
-				dispatch_async(dispatch_get_main_queue(), ^{
+			case 2:
+					dispatch_async(dispatch_get_main_queue(), ^{
 					CGAffineTransform original = result.transform;
-					result.transform = CGAffineTransformMakeScale(0.01, 0.01);
-					[UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
+           			result.transform = CGAffineTransformMakeScale(0.01, 1.0);
+					[UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.5 initialSpringVelocity:10.0  options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
 						result.transform = original;
 					} completion:NULL];
 				});
 				break;
-			case AnimationStyleStretch:
+			case 3:
+					dispatch_async(dispatch_get_main_queue(), ^{
+					CGAffineTransform original = result.transform;
+					result.transform = CGAffineTransformMakeScale(0.3, 0.5);
+					[UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.0 initialSpringVelocity:10.0  options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionCurveEaseOut animations:^{
+						result.transform = original;
+					} completion:NULL]; 
+				});
+				break;				
+			case 4:
 				dispatch_async(dispatch_get_main_queue(), ^{
 					CGAffineTransform original = result.transform;
 					result.transform = CGAffineTransformMakeScale(0.01, 1.0);
@@ -77,7 +64,7 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 					} completion:NULL];
 				});
 				break;
-			case AnimationStyleSlide:
+			case 5:
 				dispatch_async(dispatch_get_main_queue(), ^{
 					CGRect original = result.frame;
 					CGRect newFrame = original;
@@ -90,75 +77,39 @@ static AnimationStyle AnimationStyleForTableView(UITableView *tableView)
 				break;
 		}
 		return result;
-	} else {
-		return %orig();
-	}
 }
 
 %end
 
-static BOOL GetBooleanSetting(NSString *key, BOOL defaultValue)
-{
-	Boolean exists;
-	Boolean result = CFPreferencesGetAppBooleanValue((CFStringRef)key, CFSTR("com.rpetrich.cask"), &exists);
-	return exists ? result : defaultValue;
+ void initPrefs() {
+        NSString *path = @"/User/Library/Preferences/com.ryannair05.caskprefs.plist";
+        NSString *pathDefault = @"/Library/PreferenceBundles/caskprefs.bundle/defaults.plist";
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if (![fileManager fileExistsAtPath:path]) {
+            [fileManager copyItemAtPath:pathDefault toPath:path error:nil];
+        }
 }
 
-static CFIndex GetIntegerSetting(NSString *key, CFIndex defaultValue)
-{
-	Boolean exists;
-	CFIndex result = CFPreferencesGetAppIntegerValue((CFStringRef)key, CFSTR("com.rpetrich.cask"), &exists);
-	return exists ? result : defaultValue;
+// Preferences.
+void loadPrefs() {
+     @autoreleasepool {
+
+        NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.ryannair05.caskprefs.plist"];
+        if (prefs) {
+            style = [[prefs objectForKey:@"style"] integerValue];
+            duration = [[prefs objectForKey:@"duration"] doubleValue];
+            animateAlways = [[prefs objectForKey:@"animateAlways"] boolValue];
+        }
+    }
 }
 
-static double GetDoubleSetting(NSString *key, double defaultValue)
-{
-	id value = (id)CFPreferencesCopyAppValue((CFStringRef)key, CFSTR("com.rpetrich.cask"));
-	double result = [value respondsToSelector:@selector(doubleValue)] ? [value doubleValue] : defaultValue;
-	[value release];
-	return result;
-}
+%ctor {
+    @autoreleasepool {
+	    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)loadPrefs, CFSTR("com.ryannair05.caskprefs/prefsupdated"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+		initPrefs();
+		loadPrefs();
 
-static int notifyToken;
-static BOOL prepared;
-static BOOL isSpringBoard;
-
-static void PrepareSettings(void)
-{
-	if (!prepared) {
-		// Smuggle settings around in the notify state. I'm too lazy to build a real IPC center for such a simple tweak
-		if (notifyToken == 0) {
-			notify_register_check("com.rpetrich.cask.config-changed", &notifyToken);
-		}
-		if (isSpringBoard) {
-			CFPreferencesAppSynchronize(CFSTR("com.rpetrich.cask"));
-			settings.animateAlways = GetBooleanSetting(@"AnimateAlways", NO);
-			settings.animationStyle = (AnimationStyle)GetIntegerSetting(@"AnimationStyle", AnimationStyleFade);
-			settings.duration = GetDoubleSetting(@"AnimationDuration", 0.5);
-			notify_set_state(notifyToken, ((uint64_t)settings.animateAlways << 63) + ((uint64_t)settings.animationStyle << 32) + (uint64_t)(settings.duration * 1000));
-		} else {
-			uint64_t state = 0;
-			notify_get_state(notifyToken, &state);
-			settings.animateAlways = state >> 63;
-			settings.animationStyle = (AnimationStyle)((state >> 32) & 0xFF);
-			settings.duration = (NSTimeInterval)(state & 0xFFFFFFFFl) / 1000.0;
-		}
-	}
-}
-
-static void PreferencesCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
-{
-	prepared = NO;
-	if (isSpringBoard) {
-		PrepareSettings();
-	}
-}
-
-%ctor
-{
-	%init();
-	if ((isSpringBoard = (objc_getClass("SpringBoard") != nil))) {
-		PrepareSettings();
-	}
-	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PreferencesCallback, CFSTR("com.rpetrich.cask.config-changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+		if(!IN_SPRINGBOARD)
+      	  %init;
+    }
 }

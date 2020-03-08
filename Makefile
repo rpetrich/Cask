@@ -1,20 +1,19 @@
-ifeq ($(shell [ -f ./framework/makefiles/common.mk ] && echo 1 || echo 0),0)
-all clean package install::
-	git submodule update --init
-	./framework/git-submodule-recur.sh init
-	$(MAKE) $(MAKEFLAGS) MAKELEVEL=0 $@
-else
+FINALPACKAGE = 1
+
+export TARGET = iphone:13.0
+
+export ADDITIONAL_CFLAGS = -fobjc-arc
+
+include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Cask
 Cask_FILES = Tweak.x
-Cask_FRAMEWORKS = UIKit CoreGraphics
 
-OPTFLAG = -Os
+ARCHS = arm64 arm64e
 
-IPHONE_ARCHS = armv7 arm64
-TARGET_IPHONEOS_DEPLOYMENT_VERSION = 7.0
+include $(THEOS_MAKE_PATH)/tweak.mk
 
-include framework/makefiles/common.mk
-include framework/makefiles/tweak.mk
-
-endif
+after-install::
+	install.exec "killall -9 SpringBoard"
+SUBPROJECTS += caskprefs
+include $(THEOS_MAKE_PATH)/aggregate.mk
