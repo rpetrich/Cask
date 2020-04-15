@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>style</key>
-	<integer>4</integer>
+	<integer>6</integer>
 	<key>duration</key>
 	<real>0.5</real>
 	<key>animateAlways</key>

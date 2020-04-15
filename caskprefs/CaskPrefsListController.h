@@ -14,3 +14,9 @@
 @property (nonatomic, retain) UIImage *avatarImage;
 
 @end
+
+
+@interface CaskTwitterCell () {
+    NSString *_user;
+}
+@end

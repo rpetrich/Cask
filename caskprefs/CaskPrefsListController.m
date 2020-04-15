@@ -81,12 +81,6 @@
 
 @end
 
-
-@interface CaskTwitterCell () {
-    NSString *_user;
-}
-@end
-
 @implementation CaskTwitterCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier specifier:(PSSpecifier *)specifier
@@ -103,7 +97,12 @@
 
         self.textLabel.textColor = [UIColor blackColor];
 
-        self.tintColor = [UIColor labelColor];
+        if (@available(iOS 13, *)) {
+            self.tintColor = [UIColor labelColor];
+        }
+        else {
+            self.tintColor = [UIColor blackColor];
+        }
 
         CGFloat size = 29.f;
 
@@ -119,7 +118,12 @@
         _avatarView.layer.cornerRadius = size / 2;
         _avatarView.layer.borderWidth = 2;
 
-        _avatarView.layer.borderColor = [[UIColor tertiaryLabelColor] CGColor];
+        if (@available(iOS 13, *)) {
+            _avatarView.layer.borderColor = [[UIColor tertiaryLabelColor] CGColor];
+        }
+        else {
+            _avatarView.layer.borderColor = [[UIColor colorWithWhite:1 alpha:0.3] CGColor];
+        }
         [self.imageView addSubview:_avatarView];
 
         _avatarImageView = [[UIImageView alloc] initWithFrame:_avatarView.bounds];
@@ -139,9 +143,10 @@
             return self;
         }
 
-        /*self.avatarImage = [UIImage imageNamed:[NSString stringWithFormat:@"/Library/PreferenceBundles/little11prefs.bundle/%@.png", _user]];
+        /*self.avatarImage = [UIImage imageNamed:[NSString stringWithFormat:@"/Library/PreferenceBundles/caskprefs.bundle/%@.png", _user]];
          */
         // This has a delay as image needs to be downloaded
+        
         dispatch_async(dispatch_get_global_queue(0,0), ^{
             NSData * data = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://twitter.com/%@/profile_image?size=original", _user]]];
             if (data == nil)
@@ -191,9 +196,6 @@
 
 - (void)setSelected:(BOOL)arg1 animated:(BOOL)arg2
 {
-    [super setSelected:arg1 animated:arg2];
-
-    if (!arg1) return;
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[self.class _urlForUsername:_user]] options:@{} completionHandler:nil];
+    if (arg1) [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[self.class _urlForUsername:_user]] options:@{} completionHandler:nil];
 }
 @end
