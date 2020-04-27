@@ -139,7 +139,7 @@
 
         self.detailTextLabel.text = _user;
 
-        if (!_user || self.avatarImage) {
+        if (!_user) {
             return self;
         }
 
@@ -160,12 +160,6 @@
 }
 
 #pragma mark - Avatar
-
-- (UIImage *)avatarImage
-{
-    return _avatarImageView.image;
-}
-
 - (void)setAvatarImage:(UIImage *)avatarImage
 {
     _avatarImageView.image = avatarImage;
@@ -181,10 +175,12 @@
 }
 
 + (NSString *)_urlForUsername:(NSString *)user {
-
+/*
     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"aphelion://"]]) {
         return [NSString stringWithFormat: @"aphelion://profile/%@", user];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
+    } else
+    */
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
         return [NSString stringWithFormat: @"tweetbot:///user_profile/%@", user];
     } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific://"]]) {
         return [NSString stringWithFormat: @"twitterrific:///profile?screen_name=%@", user];

@@ -1,19 +1,16 @@
-#import <UIKit/UIKit.h>
-#import <Cask-Swift.h>
+#import "generated-headers/Cask-Swift.h"
 
-int style;
-BOOL animateAlways;
 BOOL hasMovedToWindow = NO;
-NSTimeInterval duration;
 
 %hook UIScrollView
 
 -(BOOL)isDragging {
-	hasMovedToWindow = !%orig;
-	return %orig;
+   BOOL const orig = %orig;
+	hasMovedToWindow = !orig;
+	return orig;
 }
 
--(void)_scrollViewWillBeginDragging{
+-(void)_scrollViewWillBeginDragging {
 	hasMovedToWindow = NO;
 	return %orig;
 }
@@ -21,48 +18,23 @@ NSTimeInterval duration;
 %end 
 
 %hook UITableView
-
 - (UITableViewCell *)_createPreparedCellForGlobalRow:(NSInteger)globalRow withIndexPath:(NSIndexPath *)indexPath willDisplay:(BOOL)willDisplay
 {
-		if (hasMovedToWindow && !animateAlways)
-			return %orig;
-
-		UITableViewCell *result = %orig;
-		Cask * cas = [[objc_getClass("Cask") alloc] init];
-		return [cas animatedTable:result style:style duration:duration];
+	UITableViewCell *result = %orig;
+	return [Cask animatedTable:result hasMovedToWindow:hasMovedToWindow];
 }
 
 %end
 
- void initPrefs() {
-        NSString *path = @"/User/Library/Preferences/com.ryannair05.caskprefs.plist";
-        NSString *pathDefault = @"/Library/PreferenceBundles/caskprefs.bundle/defaults.plist";
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        if (![fileManager fileExistsAtPath:path]) {
-            [fileManager copyItemAtPath:pathDefault toPath:path error:nil];
-        }
-}
-
-// Preferences.
 void loadPrefs() {
-     @autoreleasepool {
-
-        NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.ryannair05.caskprefs.plist"];
-        if (prefs) {
-            style = [[prefs objectForKey:@"style"] integerValue];
-            duration = [[prefs objectForKey:@"duration"] doubleValue];
-            animateAlways = [[prefs objectForKey:@"animateAlways"] boolValue];
-        }
-    }
+    [Cask loadPrefs];
 }
 
-%ctor {
-    @autoreleasepool {
-	    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)loadPrefs, CFSTR("com.ryannair05.caskprefs/prefsupdated"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-		initPrefs();
-		loadPrefs();
+%ctor{
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)loadPrefs, CFSTR("com.ryannair05.caskprefs/prefsupdated"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+    
+    loadPrefs();
 
-		if(![@"SpringBoard" isEqualToString:[NSProcessInfo processInfo].processName])
-      	  %init;
-    }
+    if (![@"SpringBoard" isEqualToString:[NSProcessInfo processInfo].processName])
+        %init;
 }
