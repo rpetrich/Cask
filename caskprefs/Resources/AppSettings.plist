@@ -7,8 +7,10 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>App Settings</string>
 			<key>footerText</key>
-			<string>Animate fresh views will cause new tables to animate whenever they are loaded, instead of only when they are are scrolled on screen.</string>
+			<string>This app must be killed for its changes to take effect.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -124,6 +126,6 @@
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Cask</string>
+	<string>Little11</string>
 </dict>
 </plist>

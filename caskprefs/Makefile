@@ -3,9 +3,9 @@ include $(THEOS)/makefiles/common.mk
 ARCHS = arm64 arm64e
 
 BUNDLE_NAME = caskprefs
-caskprefs_FILES = CaskPrefsListController.m
+caskprefs_FILES = CaskRootListController.m CaskAppSettingsController.m OrderedDictionary.m
 caskprefs_INSTALL_PATH = /Library/PreferenceBundles
-caskprefs_PRIVATE_FRAMEWORKS = Preferences
+caskprefs_PRIVATE_FRAMEWORKS = Preferences SpringBoardServices
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

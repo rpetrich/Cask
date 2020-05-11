@@ -1,6 +1,6 @@
 FINALPACKAGE = 1
 
-export TARGET = iphone:13.0:12.0
+export TARGET = iphone:13.3:12.0
 
 export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
 
@@ -17,6 +17,6 @@ ARCHS = arm64 arm64e
 include $(THEOS_MAKE_PATH)/tweak.mk
 
 after-install::
-	install.exec "killall -9 SpringBoard"
+	install.exec "killall -9 Preferences"
 SUBPROJECTS += caskprefs
 include $(THEOS_MAKE_PATH)/aggregate.mk
