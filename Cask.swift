@@ -111,10 +111,12 @@ private var animateAlways: Bool = false
             duration = prefs["duration"] as! Double
             animateAlways = prefs["animateAlways"] as! Bool
 
-            if let appSettings = prefs[Bundle.main.bundleIdentifier!] as? NSDictionary {
-                animStyle = appSettings["style"] as? Int ?? animStyle
-                duration = appSettings["duration"] as? Double ?? duration
-                animateAlways = appSettings["animateAlways"] as? Bool ?? animateAlways
+            if let bundleIdentifier = Bundle.main.bundleIdentifier {
+                if let appSettings = prefs[bundleIdentifier] as? NSDictionary {
+                    animStyle = appSettings["style"] as? Int ?? animStyle
+                    duration = appSettings["duration"] as? Double ?? duration
+                    animateAlways = appSettings["animateAlways"] as? Bool ?? animateAlways
+                }
             }
             
         }
