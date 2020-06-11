@@ -39,6 +39,7 @@
 				<integer>7</integer>
 				<integer>8</integer>
 				<integer>9</integer>
+				<integer>10</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
@@ -49,6 +50,7 @@
 				<string>Color</string>
 				<string>Permanent Color</string>
 				<string>Glitch</string>
+				<string>Helix</string>
 				<string>Rotate</string>
 				<string>Stretch</string>
 				<string>Slide</string>

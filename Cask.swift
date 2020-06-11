@@ -1,6 +1,6 @@
 import UIKit
 
-private var animStyle: Int = 8
+private var animStyle: Int = 9
 private var duration: Double = 0.5
 private var animateAlways: Bool = false
 
@@ -76,13 +76,25 @@ private var animateAlways: Bool = false
                     })
                 case 7:
                     DispatchQueue.main.async(execute: {
+                        let original = result.layer.transform
+                        let layer = result.layer
+                        result.layer.transform = CATransform3DIdentity
+                        result.layer.transform = CATransform3DTranslate(result.layer.transform, 0.0, layer.bounds.size.height/2.0, 0.0)
+                        result.layer.transform = CATransform3DRotate(result.layer.transform, CGFloat(Double.pi), 0.0, 1.0, 0.0)
+                        result.layer.transform = CATransform3DTranslate(result.layer.transform, 0.0, -layer.bounds.size.height/2.0, 0.0)
+                        UIView.animate(withDuration: duration, delay: 0, options: [.allowUserInteraction, .allowAnimatedContent, .curveEaseOut], animations: {
+                            result.layer.transform = original
+                        })
+                    })
+                case 8:
+                    DispatchQueue.main.async(execute: {
                         let original = result.transform
                         result.transform = CGAffineTransform(rotationAngle: 360)
                         UIView.animate(withDuration: duration, delay: 0.0, options: [.allowUserInteraction, .allowAnimatedContent, .curveEaseOut], animations: {
                         result.transform = original
                         })
                     })
-                case 8:
+                case 9:
                     DispatchQueue.main.async(execute: {
                         let original = result.transform
                         result.transform = CGAffineTransform(scaleX: 0.01, y: 1.0)
@@ -111,19 +123,24 @@ private var animateAlways: Bool = false
             duration = prefs["duration"] as! Double
             animateAlways = prefs["animateAlways"] as! Bool
 
-            if let appSettings = prefs[Bundle.main.bundleIdentifier!] as? NSDictionary {
-                animStyle = appSettings["style"] as? Int ?? animStyle
-                duration = appSettings["duration"] as? Double ?? duration
-                animateAlways = appSettings["animateAlways"] as? Bool ?? animateAlways
+            if let bundleIdentifier = Bundle.main.bundleIdentifier {
+                if let appSettings = prefs[bundleIdentifier] as? NSDictionary {
+                    animStyle = appSettings["style"] as? Int ?? animStyle
+                    duration = appSettings["duration"] as? Double ?? duration
+                    animateAlways = appSettings["animateAlways"] as? Bool ?? animateAlways
+                }
             }
-            
         }
         else {
             let path = "/User/Library/Preferences/com.ryannair05.caskprefs.plist"
             let pathDefault = "/Library/PreferenceBundles/caskprefs.bundle/defaults.plist"
-            do {
-                try FileManager.default.copyItem(atPath: pathDefault, toPath: path)
+            let fileManager = FileManager.default
+            if !fileManager.fileExists(atPath: path) {
+                do {
+                    try fileManager.copyItem(atPath: pathDefault, toPath: path)
                 } catch {
+                }
+                loadPrefs()
             }
         }
     }

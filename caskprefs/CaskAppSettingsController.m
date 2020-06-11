@@ -40,11 +40,7 @@
 	[(NSMutableDictionary *)[settings valueForKey:self.bundleIdentifier] setObject:value forKey:specifier.properties[@"key"]];
 	[settings writeToFile:path atomically:YES];
 
-	// pid_t pid;
-	// int status;
-	// const char* args[] = {"killall", "-9", [self.displayName UTF8String], NULL};
-	// posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
-	// waitpid(pid, &status, WEXITED);
+
 	CFStringRef notificationName = (__bridge CFStringRef)specifier.properties[@"PostNotification"];
 	if (notificationName) {
 		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationName, NULL, NULL, YES);

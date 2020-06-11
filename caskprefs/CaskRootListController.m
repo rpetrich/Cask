@@ -126,6 +126,11 @@ static OrderedDictionary *dataSourceUser;
     
     NSArray *bannedIdentifiers = [[NSArray alloc] initWithObjects:
                                   @"com.apple.sidecar",
+                                  @"com.apple.compass",
+                                  @"com.apple.AppStore",
+                                  @"com.apple.measure",
+                                  @"com.apple.calculator",
+                                  @"com.apple.tv",
                                   nil];
 
     for (NSString *key in bannedIdentifiers) {
@@ -245,11 +250,28 @@ static OrderedDictionary *dataSourceUser;
 
         // This has a delay as image needs to be downloaded
         dispatch_async(dispatch_get_global_queue(0,0), ^{
-            NSData * data = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://twitter.com/%@/profile_image?size=original", _user]]];
-            if (data == nil)
+            
+            NSString *size = [UIScreen mainScreen].scale > 2 ? @"original" : @"bigger";
+            NSError __block *err = NULL;
+            NSData __block *data;
+            BOOL __block reqProcessed = false;
+            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@/profile_image?size=%@", _user, size]]];
+            
+            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData  *_data, NSURLResponse *_response, NSError *_error) {
+                err = _error;
+                data = _data;
+                reqProcessed = true;
+            }] resume];
+
+            while (!reqProcessed) {
+                [NSThread sleepForTimeInterval:0];
+            }
+
+            if (err)
                 return;
+                
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.avatarImage = [UIImage imageWithData: data];
+                    self.avatarImage = [UIImage imageWithData: data];
             });
         });
     }
