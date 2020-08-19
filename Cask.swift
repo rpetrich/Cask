@@ -1,10 +1,10 @@
 import UIKit
 
-private var animStyle: Int = 9
+private var animStyle: Int = 11
 private var duration: Double = 0.5
 private var animateAlways: Bool = false
 
-@objc public class Cask: NSObject {
+@objc(Cask) public class Cask: NSObject {
 
     @objc public static func animatedTable(_ result: UITableViewCell, hasMovedToWindow : Bool) -> UITableViewCell {
     
@@ -14,7 +14,7 @@ private var animateAlways: Bool = false
 
         if animStyle < 6 {
             switch animStyle {
-                case 1:
+                case 1: // Fade
                     DispatchQueue.main.async(execute: {
                         let original = result.alpha
                         result.alpha = 0.0
@@ -22,7 +22,7 @@ private var animateAlways: Bool = false
                             result.alpha = original
                         })
                     })
-                case 2:
+                case 2: // Flip
                     DispatchQueue.main.async(execute: {
                         let original = result.layer.transform
                         result.layer.transform = CATransform3DMakeRotation(.pi, 1, 0, 0)
@@ -30,7 +30,7 @@ private var animateAlways: Bool = false
                             result.layer.transform = original
                         })
                     })
-                case 3:
+                case 3: // Bounce
                     DispatchQueue.main.async(execute: {
                         let original = result.transform
                         result.transform = CGAffineTransform(scaleX: 0.01, y: 1.0)
@@ -38,7 +38,7 @@ private var animateAlways: Bool = false
                             result.transform = original
                         })
                     })
-                case 4:
+                case 4: // Color
                     DispatchQueue.main.async(execute: {
                         let original = result.backgroundColor
                         let red = CGFloat((arc4random() % 256)) / 255.0
@@ -49,7 +49,7 @@ private var animateAlways: Bool = false
                             result.backgroundColor = original
                         })
                     })
-                case 5:
+                case 5: // Permanent Color
                     DispatchQueue.main.async(execute: {
                         let original = result.backgroundColor
                         let red = CGFloat((arc4random() % 256)) / 255.0
@@ -60,13 +60,13 @@ private var animateAlways: Bool = false
                             result.backgroundColor = original
                         })
                     })
-                default:
+                default: // None
                     break
             }
         }
         else {
             switch animStyle {
-                case 6:
+                case 6: // Glitch
                     DispatchQueue.main.async(execute: {
                         let original = result.transform
                         result.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
@@ -74,7 +74,7 @@ private var animateAlways: Bool = false
                             result.transform = original
                         })
                     })
-                case 7:
+                case 7: // Helix
                     DispatchQueue.main.async(execute: {
                         let original = result.layer.transform
                         let layer = result.layer
@@ -86,7 +86,7 @@ private var animateAlways: Bool = false
                             result.layer.transform = original
                         })
                     })
-                case 8:
+                case 8: // Rotate
                     DispatchQueue.main.async(execute: {
                         let original = result.transform
                         result.transform = CGAffineTransform(rotationAngle: 360)
@@ -94,7 +94,23 @@ private var animateAlways: Bool = false
                         result.transform = original
                         })
                     })
-                case 9:
+                case 9: // Zoom
+                    DispatchQueue.main.async(execute: {
+                        let original = result.transform
+                        result.transform =  CGAffineTransform(scaleX: 5, y : 5)
+                        UIView.animate(withDuration: duration, delay: 0.0, options: [.allowUserInteraction, .allowAnimatedContent, .curveLinear], animations: {
+                            result.transform = original
+                        })
+                    })
+                case 10: // Drop
+                    DispatchQueue.main.async(execute: {
+                        let original = result.transform
+                        result.transform = CGAffineTransform(translationX: 0, y: -150)
+                        UIView.animate(withDuration: duration, delay: 0.0, options: [.allowUserInteraction, .allowAnimatedContent, .curveEaseOut], animations: {
+                            result.transform = original
+                        })
+                    })
+                case 11: // Stretch
                     DispatchQueue.main.async(execute: {
                         let original = result.transform
                         result.transform = CGAffineTransform(scaleX: 0.01, y: 1.0)
@@ -102,7 +118,7 @@ private var animateAlways: Bool = false
                             result.transform = original
                         })
                     })
-                default:
+                default: // Slide
                     DispatchQueue.main.async(execute: {
                         let original = result.frame
                         var newFrame = original
@@ -119,9 +135,9 @@ private var animateAlways: Bool = false
     
     @objc public static func loadPrefs() {
         if let prefs = NSDictionary(contentsOfFile:"/User/Library/Preferences/com.ryannair05.caskprefs.plist") {
-            animStyle = prefs["style"] as! Int
-            duration = prefs["duration"] as! Double
-            animateAlways = prefs["animateAlways"] as! Bool
+            animStyle = prefs["style"] as? Int ?? 11
+            duration = prefs["duration"] as? Double ?? 0.5
+            animateAlways = prefs["animateAlways"] as? Bool ?? false
 
             if let bundleIdentifier = Bundle.main.bundleIdentifier {
                 if let appSettings = prefs[bundleIdentifier] as? NSDictionary {
@@ -139,7 +155,15 @@ private var animateAlways: Bool = false
                 do {
                     try fileManager.copyItem(atPath: pathDefault, toPath: path)
                 } catch {
-                }
+                    do {
+                        try fileManager.removeItem(atPath: path)
+                    }
+                    catch {
+                            var prefs = NSDictionary(contentsOfFile: path) as Dictionary?
+                            prefs?.removeAll()
+                            (prefs as NSDictionary?)?.write(toFile: path, atomically: true)
+                        }
+                    }
                 loadPrefs()
             }
         }

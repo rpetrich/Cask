@@ -7,6 +7,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>label</key>
+			<string> </string>
 			<key>footerText</key>
 			<string>Animate fresh views will cause new tables to animate whenever they are loaded, instead of only when they are are scrolled on screen.</string>
 		</dict>
@@ -14,7 +16,7 @@
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>default</key>
-			<integer>9</integer>
+			<integer>11</integer>
 			<key>defaults</key>
 			<string>com.ryannair05.caskprefs</string>
 			<key>key</key>
@@ -38,6 +40,8 @@
 				<integer>8</integer>
 				<integer>9</integer>
 				<integer>10</integer>
+				<integer>11</integer>
+				<integer>12</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
@@ -50,6 +54,8 @@
 				<string>Glitch</string>
 				<string>Helix</string>
 				<string>Rotate</string>
+				<string>Zoom</string>
+				<string>Drop</string>
 				<string>Stretch</string>
 				<string>Slide</string>
 			</array>
@@ -118,7 +124,7 @@
 		</dict>
 		<dict>
 			<key>cellClass</key>
-			<string>CaskTwitterCell</string>
+			<string>caskprefs.CaskTwitterCell</string>
 			<key>label</key>
 			<string>Ryan Nair</string>
 			<key>accountName</key>

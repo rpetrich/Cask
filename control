@@ -1,9 +1,9 @@
 Package: com.ryannair05.cask
 Name: Cask 2
-Depends: mobilesubstrate, preferenceloader, firmware (>= 12.0)
-Version: 1.1.2
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader, firmware (>= 12.0)
+Version: 1.2.0
 Architecture: iphoneos-arm
-Description: Animated table scrolling 
+Description: Animated table scrolling
 Maintainer: Ryan Nair
 Author: Ryan Nair
 Section: Tweaks

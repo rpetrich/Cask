@@ -16,7 +16,7 @@
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>default</key>
-			<integer>8</integer>
+			<integer>11</integer>
 			<key>defaults</key>
 			<string>com.ryannair05.caskprefs</string>
 			<key>key</key>
@@ -40,6 +40,8 @@
 				<integer>8</integer>
 				<integer>9</integer>
 				<integer>10</integer>
+				<integer>11</integer>
+				<integer>12</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
@@ -52,6 +54,8 @@
 				<string>Glitch</string>
 				<string>Helix</string>
 				<string>Rotate</string>
+				<string>Zoom</string>
+				<string>Drop</string>
 				<string>Stretch</string>
 				<string>Slide</string>
 			</array>

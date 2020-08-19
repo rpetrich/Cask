@@ -7,11 +7,15 @@
 -(BOOL)containsSpecifier:(id)arg1;
 @end
 
-@interface CaskRootListController : PSListController
+@interface CaskRootListController : PSListController{
+    UITableView * _table;
+}
 @property (nonatomic, retain) UIBarButtonItem *respringButton;
 @property (nonatomic, retain) UILabel *titleLabel;
 @property (nonatomic, retain) UIImageView *iconView;
 @property (nonatomic, retain) NSMutableDictionary *savedSpecifiers;
+@property (nonatomic, retain) UIView *headerView;
+@property (nonatomic, retain) UIImageView *headerImageView;
 -(NSDictionary*)trimDataSource:(NSDictionary*)dataSource;
 -(NSMutableArray*)appSpecifiers;
 @end
@@ -22,4 +26,6 @@
 @property (nonatomic, retain, readonly) UIImageView *avatarImageView;
 @end
 
-
+@interface Cask : NSObject
++ (void)loadPrefs;
+@end

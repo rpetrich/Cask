@@ -32,15 +32,9 @@ BOOL hasMovedToWindow = NO;
 }
 %end
 
-void loadPrefs() {
-    [Cask loadPrefs];
-}
-
 %ctor{
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)loadPrefs, CFSTR("com.ryannair05.caskprefs/prefsupdated"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-
-    if (![@"SpringBoard" isEqualToString:[NSProcessInfo processInfo].processName]) {
-        loadPrefs();
+    if ([[[[NSProcessInfo processInfo] arguments] objectAtIndex:0] containsString:@"/Application"]) {
+        [Cask loadPrefs];
         %init;
     }
 }

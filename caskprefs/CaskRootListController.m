@@ -11,13 +11,10 @@ extern "C" {
 }
 #endif
 
-static OrderedDictionary *dataSourceUser;
-
 @implementation CaskRootListController
 
 - (instancetype)init {
     self = [super init];
-
     if (self) {
         self.navigationItem.titleView = [UIView new];
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,10,10)];
@@ -28,11 +25,18 @@ static OrderedDictionary *dataSourceUser;
     
         self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,10,10)];
         self.iconView.contentMode = UIViewContentModeScaleAspectFit;
-        self.iconView.image = [UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/caskprefs.bundle/icon@2x.png"];
+        self.iconView.image = [UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/caskprefs.bundle/icon@3x.png"];
         self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
         self.iconView.alpha = 0.0;
         [self.navigationItem.titleView addSubview:self.iconView];
-    
+
+        self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,200,200)];
+        self.headerImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,200,250)];
+        self.headerImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.headerImageView.image = [UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/caskprefs.bundle/banner.png"];
+        self.headerImageView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.headerView addSubview:self.headerImageView];
+
         [NSLayoutConstraint activateConstraints:@[
             [self.titleLabel.topAnchor constraintEqualToAnchor:self.navigationItem.titleView.topAnchor],
             [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.navigationItem.titleView.leadingAnchor],
@@ -42,6 +46,10 @@ static OrderedDictionary *dataSourceUser;
             [self.iconView.leadingAnchor constraintEqualToAnchor:self.navigationItem.titleView.leadingAnchor],
             [self.iconView.trailingAnchor constraintEqualToAnchor:self.navigationItem.titleView.trailingAnchor],
             [self.iconView.bottomAnchor constraintEqualToAnchor:self.navigationItem.titleView.bottomAnchor],
+            [self.headerImageView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor],
+            [self.headerImageView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor],
+            [self.headerImageView.trailingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor],
+            [self.headerImageView.bottomAnchor constraintEqualToAnchor:self.headerView.bottomAnchor],
         ]];
     }
 
@@ -62,6 +70,16 @@ static OrderedDictionary *dataSourceUser;
             self.titleLabel.alpha = 1.0;
         }];
     }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[UISwitch appearanceWhenContainedInInstancesOfClasses:@[self.class]] setOnTintColor:[UIColor colorWithRed: 0.47 green: 0.36 blue: 0.71 alpha: 1.00]];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    tableView.tableHeaderView = self.headerView;
+    return [super tableView:tableView cellForRowAtIndexPath:indexPath];
 }
 
 - (NSArray *)specifiers {
@@ -85,6 +103,7 @@ static OrderedDictionary *dataSourceUser;
 }
 
 -(NSMutableArray*)appSpecifiers {
+
     NSMutableArray *specifiers = [NSMutableArray array];
 
     NSArray *displayIdentifiers = [(__bridge NSSet *)SBSCopyDisplayIdentifiers() allObjects];
@@ -97,7 +116,7 @@ static OrderedDictionary *dataSourceUser;
         }
     }
 
-    dataSourceUser = (OrderedDictionary*)[apps copy];
+    OrderedDictionary *dataSourceUser = (OrderedDictionary*)[apps copy];
     dataSourceUser = (OrderedDictionary*)[self trimDataSource:dataSourceUser];
     dataSourceUser = [self sortedDictionary:dataSourceUser];
     
@@ -172,149 +191,7 @@ static OrderedDictionary *dataSourceUser;
   [settings writeToFile:path atomically:YES];
   CFStringRef notificationName = (__bridge CFStringRef)specifier.properties[@"PostNotification"];
   if (notificationName) {
-   CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationName, NULL, NULL, YES);
+    [NSClassFromString(@"Cask") loadPrefs];
   }
-}
-@end
-
-@interface CaskTwitterCell () {
-    NSString *_user;
-}
-@end
-
-@implementation CaskTwitterCell
-
-- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier specifier:(PSSpecifier *)specifier
-{
-    self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:reuseIdentifier specifier:specifier];
-
-    if (self) {
-
-        self.selectionStyle = UITableViewCellSelectionStyleBlue;
-        self.accessoryView = [[UIImageView alloc] initWithFrame:CGRectMake( 0, 0, 38, 38)];
-
-        self.detailTextLabel.numberOfLines = 1;
-        self.detailTextLabel.textColor = [UIColor grayColor];
-
-        self.textLabel.textColor = [UIColor blackColor];
-        
-        if (@available(iOS 13, *)) {
-            self.tintColor = [UIColor labelColor];
-        }
-        else {
-            self.tintColor = [UIColor blackColor];
-        }
-
-        CGFloat size = 29.f;
-
-        UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, [UIScreen mainScreen].scale);
-        specifier.properties[@"iconImage"] = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-
-        _avatarView = [[UIView alloc] initWithFrame:self.imageView.bounds];
-        _avatarView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _avatarView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1];
-        _avatarView.userInteractionEnabled = NO;
-        _avatarView.clipsToBounds = YES;
-        _avatarView.layer.cornerRadius = size / 2;
-        _avatarView.layer.borderWidth = 2;
-        
-        if (@available(iOS 13, *)) {
-            _avatarView.layer.borderColor = [[UIColor tertiaryLabelColor] CGColor];
-        }
-        else {
-            _avatarView.layer.borderColor = [[UIColor colorWithWhite:1 alpha:0.3] CGColor];
-        }
-        
-        [self.imageView addSubview:_avatarView];
-
-        _avatarImageView = [[UIImageView alloc] initWithFrame:_avatarView.bounds];
-        _avatarImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _avatarImageView.alpha = 0;
-        _avatarImageView.layer.minificationFilter = kCAFilterTrilinear;
-        [_avatarView addSubview:_avatarImageView];
-
-        _user = [specifier.properties[@"accountName"] copy];
-        NSAssert(_user, @"User name not provided");
-
-        specifier.properties[@"url"] = [self.class _urlForUsername:_user];
-
-        self.detailTextLabel.text = _user;
-
-        if (!_user) {
-            return self;
-        }
-
-        /*self.avatarImage = [UIImage imageNamed:[NSString stringWithFormat:@"/Library/PreferenceBundles/caskprefs.bundle/%@.png", _user]];
-         */
-
-        // This has a delay as image needs to be downloaded
-        dispatch_async(dispatch_get_global_queue(0,0), ^{
-            
-            NSString *size = [UIScreen mainScreen].scale > 2 ? @"original" : @"bigger";
-            NSError __block *err = NULL;
-            NSData __block *data;
-            BOOL __block reqProcessed = false;
-            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://mobile.twitter.com/%@/profile_image?size=%@", _user, size]]];
-            
-            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData  *_data, NSURLResponse *_response, NSError *_error) {
-                err = _error;
-                data = _data;
-                reqProcessed = true;
-            }] resume];
-
-            while (!reqProcessed) {
-                [NSThread sleepForTimeInterval:0];
-            }
-
-            if (err)
-                return;
-                
-            dispatch_async(dispatch_get_main_queue(), ^{
-                    self.avatarImage = [UIImage imageWithData: data];
-            });
-        });
-    }
-    return self;
-}
-
-#pragma mark - Avatar
-
-- (void)setAvatarImage:(UIImage *)avatarImage
-{
-    _avatarImageView.image = avatarImage;
-
-    if (_avatarImageView.alpha == 0)
-    {
-        [UIView animateWithDuration:0.15
-            animations:^{
-                _avatarImageView.alpha = 1;
-            }
-        ];
-    }
-}
-
-
-+ (NSString *)_urlForUsername:(NSString *)user {
-
-    /* if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"aphelion://"]]) {
-        return [NSString stringWithFormat: @"aphelion://profile/%@", user]; //Easter egg by hbkirb
-    } else
-    */ if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot://"]]) {
-        return [NSString stringWithFormat: @"tweetbot:///user_profile/%@", user];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific://"]]) {
-        return [NSString stringWithFormat: @"twitterrific:///profile?screen_name=%@", user];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetings://"]]) {
-        return [NSString stringWithFormat: @"tweetings:///user?screen_name=%@", user];
-    } else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter://"]]) {
-        return [NSString stringWithFormat: @"twitter://user?screen_name=%@", user];
-    } else {
-        return [NSString stringWithFormat: @"https://mobile.twitter.com/%@", user];
-    }
-}
-
-- (void)setSelected:(BOOL)arg1 animated:(BOOL)arg2
-{
-    if (arg1) [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[self.class _urlForUsername:_user]] options:@{} completionHandler:nil];
 }
 @end
