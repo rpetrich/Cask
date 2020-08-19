@@ -124,7 +124,7 @@
 		</dict>
 		<dict>
 			<key>cellClass</key>
-			<string>CaskTwitterCell</string>
+			<string>caskprefs.CaskTwitterCell</string>
 			<key>label</key>
 			<string>Ryan Nair</string>
 			<key>accountName</key>

@@ -20,12 +20,6 @@
 -(NSMutableArray*)appSpecifiers;
 @end
 
-@interface CaskTwitterCell : PSTableCell
-
-@property (nonatomic, retain, readonly) UIView *avatarView;
-@property (nonatomic, retain, readonly) UIImageView *avatarImageView;
-@end
-
 @interface Cask : NSObject
 + (void)loadPrefs;
 @end
