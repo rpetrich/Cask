@@ -1,7 +1,7 @@
 #import "CaskAppSettingsController.h"
 #import <Preferences/PSTableCell.h>
 #include <spawn.h>
-#import "OrderedDictionary.h"
+#import "caskprefs-Swift.h"
 
 @interface PSListController (Method)
 -(BOOL)containsSpecifier:(id)arg1;
