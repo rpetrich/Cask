@@ -2,38 +2,29 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>title</key>
-	<string>Cask</string>
-	<key>entry</key>
-	<dict>
-		<key>cell</key>
-		<string>PSLinkCell</string>
-		<key>icon</key>
-		<string>/Library/PreferenceLoader/Preferences/Cask/Cask.png</string>
-		<key>label</key>
-		<string>Cask</string>
-	</dict>
 	<key>items</key>
 	<array>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>label</key>
+			<string> </string>
 			<key>footerText</key>
-			<string>Animate fresh views will cause new tables to animate all of their cells instead of only when new cells are scrolled on screen</string>
+			<string>Animate fresh views will cause new tables to animate whenever they are loaded, instead of only when they are are scrolled on screen.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>default</key>
-			<integer>1</integer>
+			<integer>11</integer>
 			<key>defaults</key>
-			<string>com.rpetrich.cask</string>
+			<string>com.ryannair05.caskprefs</string>
 			<key>key</key>
-			<string>AnimationStyle</string>
+			<string>style</string>
 			<key>label</key>
 			<string>Style</string>
 			<key>PostNotification</key>
-			<string>com.rpetrich.cask.config-changed</string>
+			<string>com.ryannair05.caskprefs/prefsupdated</string>
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>validValues</key>
@@ -43,12 +34,28 @@
 				<integer>2</integer>
 				<integer>3</integer>
 				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
+				<integer>9</integer>
+				<integer>10</integer>
+				<integer>11</integer>
+				<integer>12</integer>
 			</array>
 			<key>validTitles</key>
 			<array>
 				<string>None</string>
 				<string>Fade</string>
-				<string>Grow</string>
+				<string>Flip</string>
+				<string>Bounce</string>
+				<string>Color</string>
+				<string>Permanent Color</string>
+				<string>Glitch</string>
+				<string>Helix</string>
+				<string>Rotate</string>
+				<string>Zoom</string>
+				<string>Drop</string>
 				<string>Stretch</string>
 				<string>Slide</string>
 			</array>
@@ -59,13 +66,13 @@
 			<key>default</key>
 			<real>0.5</real>
 			<key>defaults</key>
-			<string>com.rpetrich.cask</string>
+			<string>com.ryannair05.caskprefs</string>
 			<key>key</key>
-			<string>AnimationDuration</string>
+			<string>duration</string>
 			<key>label</key>
 			<string>Duration</string>
 			<key>PostNotification</key>
-			<string>com.rpetrich.cask.config-changed</string>
+			<string>com.ryannair05.caskprefs/prefsupdated</string>
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>validValues</key>
@@ -101,20 +108,30 @@
 			<key>default</key>
 			<false/>
 			<key>defaults</key>
-			<string>com.rpetrich.cask</string>
+			<string>com.ryannair05.caskprefs</string>
 			<key>key</key>
-			<string>AnimateAlways</string>
+			<string>animateAlways</string>
 			<key>label</key>
 			<string>Animate Fresh Views</string>
 			<key>PostNotification</key>
-			<string>com.rpetrich.cask.config-changed</string>
+			<string>com.ryannair05.caskprefs/prefsupdated</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>© 2015 Ryan Petrich</string>
+			<key>label</key>
+			<string>Developed By </string>
+		</dict>
+		<dict>
+			<key>cellClass</key>
+			<string>caskprefs.CaskTwitterCell</string>
+			<key>label</key>
+			<string>Ryan Nair</string>
+			<key>accountName</key>
+			<string>@ryannair05</string>
 		</dict>
 	</array>
+	<key>title</key>
+	<string>Cask</string>
 </dict>
 </plist>

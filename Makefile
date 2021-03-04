@@ -1,20 +1,23 @@
-ifeq ($(shell [ -f ./framework/makefiles/common.mk ] && echo 1 || echo 0),0)
-all clean package install::
-	git submodule update --init
-	./framework/git-submodule-recur.sh init
-	$(MAKE) $(MAKEFLAGS) MAKELEVEL=0 $@
-else
+THEOS_DEVICE_IP = 192.168.1.208
+
+FINALPACKAGE = 1
+
+export TARGET = iphone:13.5:12.0
+
+export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc -O3
+
+include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Cask
-Cask_FILES = Tweak.x
-Cask_FRAMEWORKS = UIKit CoreGraphics
+Cask_FILES = Tweak.x Cask.swift
 
-OPTFLAG = -Os
+_THEOS_TARGET_SWIFT_LDPATH = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/swift/iphoneos -L/usr/lib/swift -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/swift-5.0/iphoneos/ -rpath /usr/lib/swift
 
-IPHONE_ARCHS = armv7 arm64
-TARGET_IPHONEOS_DEPLOYMENT_VERSION = 7.0
+ARCHS = arm64 arm64e
 
-include framework/makefiles/common.mk
-include framework/makefiles/tweak.mk
+include $(THEOS_MAKE_PATH)/tweak.mk
 
-endif
+after-install::
+	install.exec "killall -9 Preferences"
+SUBPROJECTS += caskprefs
+include $(THEOS_MAKE_PATH)/aggregate.mk
